@@ -1,0 +1,57 @@
+K 26
+svn:wc:ra_dav:activity-url
+V 21
+/repos/tacc/!svn/act/
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/repos/tacc/!svn/ver/1478/losf/admin/slurm_showq
+END
+showq.conf.example
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/tacc/!svn/ver/1774/losf/admin/slurm_showq/showq.conf.example
+END
+GetPot
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/tacc/!svn/ver/1474/losf/admin/slurm_showq/GetPot
+END
+configure.ac
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/tacc/!svn/ver/1774/losf/admin/slurm_showq/configure.ac
+END
+slurm_showq.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/tacc/!svn/ver/1804/losf/admin/slurm_showq/slurm_showq.cpp
+END
+main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/tacc/!svn/ver/1474/losf/admin/slurm_showq/main.cpp
+END
+slurm_showq.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/tacc/!svn/ver/1552/losf/admin/slurm_showq/slurm_showq.h
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/repos/tacc/!svn/ver/1774/losf/admin/slurm_showq/Makefile.am
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/tacc/!svn/ver/1777/losf/admin/slurm_showq/README
+END

@@ -1,0 +1,799 @@
+They can be found at:
+
+slurm/slurm.h 
+src/common/slurm_protocol_defs.c
+
+based on slurm version 15.08.0:
+
+
+
+
+Reasons for job to be pending */
+        WAIT_NO_REASON = 0,     /* not set or job not pending */
+        WAIT_PRIORITY,          /* higher priority jobs exist */
+        WAIT_DEPENDENCY,        /* dependent job has not completed */
+        WAIT_RESOURCES,         /* required resources not available */
+        WAIT_PART_NODE_LIMIT,   /* request exceeds partition node limit */
+        WAIT_PART_TIME_LIMIT,   /* request exceeds partition time limit */
+        WAIT_PART_DOWN,         /* requested partition is down */
+        WAIT_PART_INACTIVE,     /* requested partition is inactive */
+        WAIT_HELD,              /* job is held by administrator */
+        WAIT_TIME,              /* job waiting for specific begin time */
+	WAIT_LICENSES,          /* job is waiting for licenses */
+        
+11	WAIT_ASSOC_JOB_LIMIT,   /* user/bank job limit reached */
+        WAIT_ASSOC_RESOURCE_LIMIT,/* user/bank resource limit reached */
+        WAIT_ASSOC_TIME_LIMIT,  /* user/bank time limit reached */
+        WAIT_RESERVATION,       /* reservation not available */
+        WAIT_NODE_NOT_AVAIL,    /* required node is DOWN or DRAINED */
+        WAIT_HELD_USER,         /* job is held by user */
+        WAIT_FRONT_END,         /* Front end nodes are DOWN */
+        FAIL_DOWN_PARTITION,    /* partition for job is DOWN */
+        FAIL_DOWN_NODE,         /* some node in the allocation failed */
+        FAIL_BAD_CONSTRAINTS,   /* constraints can not be satisfied */
+  
+21      FAIL_SYSTEM,            /* slurm system failure */
+        FAIL_LAUNCH,            /* unable to launch job */
+        FAIL_EXIT_CODE,         /* exit code was non-zero */
+        FAIL_TIMEOUT,           /* reached end of time limit */
+        FAIL_INACTIVE_LIMIT,    /* reached slurm InactiveLimit */
+        FAIL_ACCOUNT,           /* invalid account */
+        FAIL_QOS,               /* invalid QOS */
+        WAIT_QOS_THRES,         /* required QOS threshold has been breached */
+        WAIT_QOS_JOB_LIMIT,     /* QOS job limit reached */
+        WAIT_QOS_RESOURCE_LIMIT,/* QOS resource limit reached */
+
+31      WAIT_QOS_TIME_LIMIT,    /* QOS time limit reached */
+        WAIT_BLOCK_MAX_ERR,     /* BLUEGENE Block has too many cnodes
+                                 * in error state to allow more jobs. */
+        WAIT_BLOCK_D_ACTION,    /* BLUEGENE Block is being freed,
+                                 * can't allow more jobs. */
+        WAIT_CLEANING,          /* If a job is requeued and it is
+                                 * still cleaning up from the last run. */
+        WAIT_PROLOG,            /* Prolog is running */
+        WAIT_QOS,               /* QOS not allowed */
+        WAIT_ACCOUNT,           /* Account not allowed */
+        WAIT_DEP_INVALID,        /* Dependency condition invalid or never
+                                  * satisfied
+                                  */
+        WAIT_QOS_GRP_CPU,            /* QOS GrpTRES exceeded (CPU) */
+        WAIT_QOS_GRP_CPU_MIN,        /* QOS GrpTRESMins exceeded (CPU) */
+
+41      WAIT_QOS_GRP_CPU_RUN_MIN,    /* QOS GrpTRESRunMins exceeded (CPU) */
+        WAIT_QOS_GRP_JOB,            /* QOS GrpJobs exceeded */
+        WAIT_QOS_GRP_MEM,            /* QOS GrpTRES exceeded (Memory) */
+        WAIT_QOS_GRP_NODE,           /* QOS GrpTRES exceeded (Node) */
+        WAIT_QOS_GRP_SUB_JOB,        /* QOS GrpSubmitJobs exceeded */
+        WAIT_QOS_GRP_WALL,           /* QOS GrpWall exceeded */
+        WAIT_QOS_MAX_CPU_PER_JOB,    /* QOS MaxTRESPerJob exceeded (CPU) */
+        WAIT_QOS_MAX_CPU_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob exceeded (CPU) */
+        WAIT_QOS_MAX_NODE_PER_JOB,   /* QOS MaxTRESPerJob exceeded (Node) */
+        WAIT_QOS_MAX_WALL_PER_JOB,   /* QOS MaxWallDurationPerJob exceeded */
+
+51      WAIT_QOS_MAX_CPU_PER_USER,   /* QOS MaxTRESPerUser exceeded (CPU) */
+        WAIT_QOS_MAX_JOB_PER_USER,   /* QOS MaxJobsPerUser exceeded */
+        WAIT_QOS_MAX_NODE_PER_USER,  /* QOS MaxTRESPerUser exceeded (Node) */
+        WAIT_QOS_MAX_SUB_JOB,        /* QOS MaxSubmitJobsPerUser exceeded */
+        WAIT_QOS_MIN_CPU,            /* QOS MinTRESPerJob not reached (CPU) */
+        WAIT_ASSOC_GRP_CPU,          /* ASSOC GrpTRES exceeded (CPU) */
+        WAIT_ASSOC_GRP_CPU_MIN,      /* ASSOC GrpTRESMins exceeded (CPU) */
+        WAIT_ASSOC_GRP_CPU_RUN_MIN,  /* ASSOC GrpTRESRunMins exceeded (CPU) */
+        WAIT_ASSOC_GRP_JOB,          /* ASSOC GrpJobs exceeded */
+        WAIT_ASSOC_GRP_MEM,          /* ASSOC GrpTRES exceeded (Memory) */
+
+61      WAIT_ASSOC_GRP_NODE,         /* ASSOC GrpTRES exceeded (Node) */
+        WAIT_ASSOC_GRP_SUB_JOB,      /* ASSOC GrpSubmitJobs exceeded */
+        WAIT_ASSOC_GRP_WALL,         /* ASSOC GrpWall exceeded */
+        WAIT_ASSOC_MAX_JOBS,         /* ASSOC MaxJobs exceeded */
+        WAIT_ASSOC_MAX_CPU_PER_JOB,  /* ASSOC MaxTRESPerJob exceeded (CPU) */
+        WAIT_ASSOC_MAX_CPU_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob
+                                         * exceeded (CPU) */
+        WAIT_ASSOC_MAX_NODE_PER_JOB, /* ASSOC MaxTRESPerJob exceeded (NODE) */
+        WAIT_ASSOC_MAX_WALL_PER_JOB, /* ASSOC MaxWallDurationPerJob
+                                      * exceeded */
+        WAIT_ASSOC_MAX_SUB_JOB,      /* ASSOC MaxSubmitJobsPerUser exceeded */
+
+        WAIT_MAX_REQUEUE,            /* MAX_BATCH_REQUEUE reached */
+
+71      WAIT_ARRAY_TASK_LIMIT,       /* job array running task limit */
+        WAIT_BURST_BUFFER_RESOURCE,  /* Burst buffer resources */
+        WAIT_BURST_BUFFER_STAGING,   /* Burst buffer file stage-in */
+        FAIL_BURST_BUFFER_OP,        /* Burst buffer operation failure */
+        WAIT_POWER_NOT_AVAIL,        /* not enough power available */
+        WAIT_POWER_RESERVED,         /* job is waiting for available power
+                                      * because of power reservations */
+        WAIT_ASSOC_GRP_UNK,          /* ASSOC GrpTRES exceeded
+                                      * (Unknown) */
+        WAIT_ASSOC_GRP_UNK_MIN,      /* ASSOC GrpTRESMins exceeded
+                                      * (Unknown) */
+        WAIT_ASSOC_GRP_UNK_RUN_MIN,  /* ASSOC GrpTRESRunMins exceeded
+                                      * (Unknown) */
+        WAIT_ASSOC_MAX_UNK_PER_JOB,  /* ASSOC MaxTRESPerJob exceeded
+                                      * (Unknown) */
+
+81      WAIT_ASSOC_MAX_UNK_PER_NODE,  /* ASSOC MaxTRESPerNode exceeded
+                                       * (Unknown) */
+        WAIT_ASSOC_MAX_UNK_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob
+                                         * exceeded (Unknown) */
+        WAIT_ASSOC_MAX_CPU_PER_NODE,  /* ASSOC MaxTRESPerNode exceeded (CPU) */
+        WAIT_ASSOC_GRP_MEM_MIN,      /* ASSOC GrpTRESMins exceeded
+                                      * (Memory) */
+        WAIT_ASSOC_GRP_MEM_RUN_MIN,  /* ASSOC GrpTRESRunMins exceeded
+                                      * (Memory) */
+        WAIT_ASSOC_MAX_MEM_PER_JOB,  /* ASSOC MaxTRESPerJob exceeded (Memory) */
+        WAIT_ASSOC_MAX_MEM_PER_NODE,  /* ASSOC MaxTRESPerNode exceeded (CPU) */
+        WAIT_ASSOC_MAX_MEM_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob
+                                         * exceeded (Memory) */
+        WAIT_ASSOC_GRP_NODE_MIN,     /* ASSOC GrpTRESMins exceeded (Node) */
+        WAIT_ASSOC_GRP_NODE_RUN_MIN, /* ASSOC GrpTRESRunMins exceeded (Node) */
+
+91      WAIT_ASSOC_MAX_NODE_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob
+                                          * exceeded (Node) */
+        WAIT_ASSOC_GRP_ENERGY,           /* ASSOC GrpTRES exceeded
+                                          * (Energy) */
+        WAIT_ASSOC_GRP_ENERGY_MIN,       /* ASSOC GrpTRESMins exceeded
+                                          * (Energy) */
+        WAIT_ASSOC_GRP_ENERGY_RUN_MIN,   /* ASSOC GrpTRESRunMins exceeded
+                                          * (Energy) */
+        WAIT_ASSOC_MAX_ENERGY_PER_JOB,   /* ASSOC MaxTRESPerJob exceeded
+                                          * (Energy) */
+        WAIT_ASSOC_MAX_ENERGY_PER_NODE,  /* ASSOC MaxTRESPerNode
+                                          * exceeded (Energy) */
+        WAIT_ASSOC_MAX_ENERGY_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob
+                                            * exceeded (Energy) */
+        WAIT_ASSOC_GRP_GRES,          /* ASSOC GrpTRES exceeded (GRES) */
+        WAIT_ASSOC_GRP_GRES_MIN,      /* ASSOC GrpTRESMins exceeded (GRES) */
+        WAIT_ASSOC_GRP_GRES_RUN_MIN,  /* ASSOC GrpTRESRunMins exceeded (GRES) */
+
+101     WAIT_ASSOC_MAX_GRES_PER_JOB,  /* ASSOC MaxTRESPerJob exceeded (GRES) */
+        WAIT_ASSOC_MAX_GRES_PER_NODE, /* ASSOC MaxTRESPerNode exceeded (GRES) */
+        WAIT_ASSOC_MAX_GRES_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob
+                                          * exceeded (GRES) */
+        WAIT_ASSOC_GRP_LIC,          /* ASSOC GrpTRES exceeded
+                                      * (license) */
+        WAIT_ASSOC_GRP_LIC_MIN,      /* ASSOC GrpTRESMins exceeded
+                                      * (license) */
+        WAIT_ASSOC_GRP_LIC_RUN_MIN,  /* ASSOC GrpTRESRunMins exceeded
+                                      * (license) */
+        WAIT_ASSOC_MAX_LIC_PER_JOB,  /* ASSOC MaxTRESPerJob exceeded
+                                      * (license) */
+        WAIT_ASSOC_MAX_LIC_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob exceeded
+                                         * (license) */
+        WAIT_ASSOC_GRP_BB,          /* ASSOC GrpTRES exceeded
+                                     * (burst buffer) */
+        WAIT_ASSOC_GRP_BB_MIN,      /* ASSOC GrpTRESMins exceeded
+                                     * (burst buffer) */
+        WAIT_ASSOC_GRP_BB_RUN_MIN,  /* ASSOC GrpTRESRunMins exceeded
+                                     * (burst buffer) */
+        WAIT_ASSOC_MAX_BB_PER_JOB,  /* ASSOC MaxTRESPerJob exceeded
+                                     * (burst buffer) */
+        WAIT_ASSOC_MAX_BB_PER_NODE, /* ASSOC MaxTRESPerNode exceeded
+                                     * (burst buffer) */
+        WAIT_ASSOC_MAX_BB_MINS_PER_JOB,/* ASSOC MaxTRESMinsPerJob exceeded
+                                        * (burst buffer) */
+        WAIT_QOS_GRP_UNK,           /* QOS GrpTRES exceeded (Unknown) */
+        WAIT_QOS_GRP_UNK_MIN,       /* QOS GrpTRESMins exceeded (Unknown) */
+        WAIT_QOS_GRP_UNK_RUN_MIN,   /* QOS GrpTRESRunMins exceeded (Unknown) */
+        WAIT_QOS_MAX_UNK_PER_JOB,   /* QOS MaxTRESPerJob exceeded (Unknown) */
+        WAIT_QOS_MAX_UNK_PER_NODE,  /* QOS MaxTRESPerNode exceeded (Unknown) */
+        WAIT_QOS_MAX_UNK_PER_USER,  /* QOS MaxTRESPerUser exceeded (Unknown) */
+        WAIT_QOS_MAX_UNK_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob
+                                       * exceeded (Unknown) */
+        WAIT_QOS_MIN_UNK,           /* QOS MinTRESPerJob exceeded (Unknown) */
+        WAIT_QOS_MAX_CPU_PER_NODE,  /* QOS MaxTRESPerNode exceeded (CPU) */
+        WAIT_QOS_GRP_MEM_MIN,       /* QOS GrpTRESMins exceeded
+                                     * (Memory) */
+        WAIT_QOS_GRP_MEM_RUN_MIN,   /* QOS GrpTRESRunMins exceeded
+                                     * (Memory) */
+        WAIT_QOS_MAX_MEM_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob
+                                       * exceeded (Memory) */
+        WAIT_QOS_MAX_MEM_PER_JOB,   /* QOS MaxTRESPerJob exceeded (CPU) */
+        WAIT_QOS_MAX_MEM_PER_NODE,  /* QOS MaxTRESPerNode exceeded (MEM) */
+        WAIT_QOS_MAX_MEM_PER_USER,  /* QOS MaxTRESPerUser exceeded (CPU) */
+        WAIT_QOS_MIN_MEM,           /* QOS MinTRESPerJob not reached (Memory) */
+        WAIT_QOS_GRP_ENERGY,        /* QOS GrpTRES exceeded (Energy) */
+        WAIT_QOS_GRP_ENERGY_MIN,    /* QOS GrpTRESMins exceeded (Energy) */
+        WAIT_QOS_GRP_ENERGY_RUN_MIN, /* QOS GrpTRESRunMins exceeded (Energy) */
+        WAIT_QOS_MAX_ENERGY_PER_JOB, /* QOS MaxTRESPerJob exceeded (Energy) */
+        WAIT_QOS_MAX_ENERGY_PER_NODE,/* QOS MaxTRESPerNode exceeded (Energy) */
+        WAIT_QOS_MAX_ENERGY_PER_USER,/* QOS MaxTRESPerUser exceeded (Energy) */
+        WAIT_QOS_MAX_ENERGY_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob
+                                          * exceeded (Energy) */
+        WAIT_QOS_MIN_ENERGY,        /* QOS MinTRESPerJob not reached (Energy) */
+        WAIT_QOS_GRP_NODE_MIN,     /* QOS GrpTRESMins exceeded (Node) */
+        WAIT_QOS_GRP_NODE_RUN_MIN, /* QOS GrpTRESRunMins exceeded (Node) */
+        WAIT_QOS_MAX_NODE_MINS_PER_JOB,  /* QOS MaxTRESMinsPerJob
+                                          * exceeded (Node) */
+        WAIT_QOS_MIN_NODE,          /* QOS MinTRESPerJob not reached (Node) */
+        WAIT_QOS_GRP_GRES,          /* QOS GrpTRES exceeded (GRES) */
+        WAIT_QOS_GRP_GRES_MIN,      /* QOS GrpTRESMins exceeded (GRES) */
+        WAIT_QOS_GRP_GRES_RUN_MIN,  /* QOS GrpTRESRunMins exceeded (GRES) */
+        WAIT_QOS_MAX_GRES_PER_JOB,  /* QOS MaxTRESPerJob exceeded (GRES) */
+        WAIT_QOS_MAX_GRES_PER_NODE, /* QOS MaxTRESPerNode exceeded (GRES) */
+        WAIT_QOS_MAX_GRES_PER_USER, /* QOS MaxTRESPerUser exceeded
+                                     * (GRES) */
+        WAIT_QOS_MAX_GRES_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob
+                                        * exceeded (GRES) */
+        WAIT_QOS_MIN_GRES,          /* QOS MinTRESPerJob not reached (CPU) */
+        WAIT_QOS_GRP_LIC,           /* QOS GrpTRES exceeded (license) */
+        WAIT_QOS_GRP_LIC_MIN,       /* QOS GrpTRESMins exceeded (license) */
+        WAIT_QOS_GRP_LIC_RUN_MIN,   /* QOS GrpTRESRunMins exceeded (license) */
+        WAIT_QOS_MAX_LIC_PER_JOB,   /* QOS MaxTRESPerJob exceeded (license) */
+        WAIT_QOS_MAX_LIC_PER_USER,  /* QOS MaxTRESPerUser exceeded (license) */
+        WAIT_QOS_MAX_LIC_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob exceeded
+                                       * (license) */
+        WAIT_QOS_MIN_LIC,           /* QOS MinTRESPerJob not reached
+                                     * (license) */
+        WAIT_QOS_GRP_BB,            /* QOS GrpTRES exceeded
+                                     * (burst buffer) */
+        WAIT_QOS_GRP_BB_MIN,        /* QOS GrpTRESMins exceeded
+                                     * (burst buffer) */
+        WAIT_QOS_GRP_BB_RUN_MIN,    /* QOS GrpTRESRunMins exceeded
+                                     * (burst buffer) */
+        WAIT_QOS_MAX_BB_PER_JOB,   /* QOS MaxTRESPerJob exceeded
+                                    * (burst buffer) */
+        WAIT_QOS_MAX_BB_PER_NODE,  /* QOS MaxTRESPerNode exceeded
+                                    * (burst buffer) */
+        WAIT_QOS_MAX_BB_PER_USER,  /* QOS MaxTRESPerUser exceeded
+                                    * (burst buffer) */
+        WAIT_QOS_MAX_BB_MINS_PER_JOB,/* QOS MaxTRESMinsPerJob exceeded
+                                      * (burst buffer) */
+        WAIT_QOS_MIN_BB,           /* QOS MinTRESPerJob not reached
+                                    * (burst buffer) */
+};
+
+
+
+
+
+
+        REQUEST_NODE_REGISTRATION_STATUS = 1001,
+        MESSAGE_NODE_REGISTRATION_STATUS,
+        REQUEST_RECONFIGURE,
+        RESPONSE_RECONFIGURE,
+        REQUEST_SHUTDOWN,
+        REQUEST_SHUTDOWN_IMMEDIATE,
+        RESPONSE_SHUTDOWN,
+        REQUEST_PING,
+        REQUEST_CONTROL,
+        REQUEST_SET_DEBUG_LEVEL,
+        REQUEST_HEALTH_CHECK,
+        REQUEST_TAKEOVER,
+        REQUEST_SET_SCHEDLOG_LEVEL,
+        REQUEST_SET_DEBUG_FLAGS,
+        REQUEST_REBOOT_NODES,
+        RESPONSE_PING_SLURMD,
+        REQUEST_ACCT_GATHER_UPDATE,
+        RESPONSE_ACCT_GATHER_UPDATE,
+        REQUEST_ACCT_GATHER_ENERGY,
+        RESPONSE_ACCT_GATHER_ENERGY,
+        REQUEST_LICENSE_INFO,
+        RESPONSE_LICENSE_INFO,
+
+        REQUEST_BUILD_INFO      = 2001,
+        RESPONSE_BUILD_INFO,
+        REQUEST_JOB_INFO,
+        RESPONSE_JOB_INFO,
+        REQUEST_JOB_STEP_INFO,
+        RESPONSE_JOB_STEP_INFO,
+        REQUEST_NODE_INFO,
+        RESPONSE_NODE_INFO,
+        REQUEST_PARTITION_INFO,
+        RESPONSE_PARTITION_INFO,        /* 2010 */
+        REQUEST_ACCTING_INFO,
+        RESPONSE_ACCOUNTING_INFO,
+        REQUEST_JOB_ID,
+        RESPONSE_JOB_ID,
+        REQUEST_BLOCK_INFO,
+        RESPONSE_BLOCK_INFO,
+        REQUEST_TRIGGER_SET,
+        REQUEST_TRIGGER_GET,
+        REQUEST_TRIGGER_CLEAR,
+        RESPONSE_TRIGGER_GET,           /* 2020 */
+        REQUEST_JOB_INFO_SINGLE,
+        REQUEST_SHARE_INFO,
+        RESPONSE_SHARE_INFO,
+        REQUEST_RESERVATION_INFO,
+        RESPONSE_RESERVATION_INFO,
+        REQUEST_PRIORITY_FACTORS,
+        RESPONSE_PRIORITY_FACTORS,
+        REQUEST_TOPO_INFO,
+        RESPONSE_TOPO_INFO,
+        REQUEST_TRIGGER_PULL,           /* 2030 */
+        REQUEST_FRONT_END_INFO,
+        RESPONSE_FRONT_END_INFO,
+        REQUEST_SPANK_ENVIRONMENT,
+        RESPONCE_SPANK_ENVIRONMENT,
+        REQUEST_STATS_INFO,
+        RESPONSE_STATS_INFO,
+        REQUEST_BURST_BUFFER_INFO,
+        RESPONSE_BURST_BUFFER_INFO,
+        REQUEST_JOB_USER_INFO,
+        REQUEST_NODE_INFO_SINGLE,  /* 2040 */
+        REQUEST_POWERCAP_INFO,
+        RESPONSE_POWERCAP_INFO,
+        REQUEST_ASSOC_MGR_INFO,
+        RESPONSE_ASSOC_MGR_INFO,
+        REQUEST_SICP_INFO,
+        RESPONSE_SICP_INFO,
+        REQUEST_LAYOUT_INFO,
+        RESPONSE_LAYOUT_INFO,
+
+        REQUEST_UPDATE_JOB = 3001,
+        REQUEST_UPDATE_NODE,
+        REQUEST_CREATE_PARTITION,
+        REQUEST_DELETE_PARTITION,
+        REQUEST_UPDATE_PARTITION,
+        REQUEST_CREATE_RESERVATION,
+        RESPONSE_CREATE_RESERVATION,
+        REQUEST_DELETE_RESERVATION,
+        REQUEST_UPDATE_RESERVATION,
+        REQUEST_UPDATE_BLOCK,
+        REQUEST_UPDATE_FRONT_END,
+        REQUEST_UPDATE_LAYOUT,
+        REQUEST_UPDATE_POWERCAP,
+
+        REQUEST_RESOURCE_ALLOCATION = 4001,
+        RESPONSE_RESOURCE_ALLOCATION,
+        REQUEST_SUBMIT_BATCH_JOB,
+        RESPONSE_SUBMIT_BATCH_JOB,
+        REQUEST_BATCH_JOB_LAUNCH,
+        REQUEST_CANCEL_JOB,
+        RESPONSE_CANCEL_JOB,
+        REQUEST_JOB_RESOURCE,
+        RESPONSE_JOB_RESOURCE,
+        REQUEST_JOB_ATTACH,
+        RESPONSE_JOB_ATTACH,
+        REQUEST_JOB_WILL_RUN,
+        RESPONSE_JOB_WILL_RUN,
+        REQUEST_JOB_ALLOCATION_INFO,
+        RESPONSE_JOB_ALLOCATION_INFO,
+        REQUEST_JOB_ALLOCATION_INFO_LITE,
+        RESPONSE_JOB_ALLOCATION_INFO_LITE,
+        REQUEST_UPDATE_JOB_TIME,
+        REQUEST_JOB_READY,
+        RESPONSE_JOB_READY,
+        REQUEST_JOB_END_TIME,
+        REQUEST_JOB_NOTIFY,
+        REQUEST_JOB_SBCAST_CRED,
+        RESPONSE_JOB_SBCAST_CRED,
+
+        REQUEST_JOB_STEP_CREATE = 5001,
+        RESPONSE_JOB_STEP_CREATE,
+        REQUEST_RUN_JOB_STEP,
+        RESPONSE_RUN_JOB_STEP,
+        REQUEST_CANCEL_JOB_STEP,
+        RESPONSE_CANCEL_JOB_STEP,
+        REQUEST_UPDATE_JOB_STEP,
+        DEFUNCT_RESPONSE_COMPLETE_JOB_STEP, /* DEFUNCT */
+        REQUEST_CHECKPOINT,
+        RESPONSE_CHECKPOINT,
+        REQUEST_CHECKPOINT_COMP,
+        REQUEST_CHECKPOINT_TASK_COMP,
+        RESPONSE_CHECKPOINT_COMP,
+        REQUEST_SUSPEND,
+        RESPONSE_SUSPEND,
+        REQUEST_STEP_COMPLETE,
+        REQUEST_COMPLETE_JOB_ALLOCATION,
+        REQUEST_COMPLETE_BATCH_SCRIPT,
+        REQUEST_JOB_STEP_STAT,
+        RESPONSE_JOB_STEP_STAT,
+        REQUEST_STEP_LAYOUT,
+        RESPONSE_STEP_LAYOUT,
+        REQUEST_JOB_REQUEUE,
+        REQUEST_DAEMON_STATUS,
+        RESPONSE_SLURMD_STATUS,
+        RESPONSE_SLURMCTLD_STATUS,
+        REQUEST_JOB_STEP_PIDS,
+        RESPONSE_JOB_STEP_PIDS,
+        REQUEST_FORWARD_DATA,
+        REQUEST_COMPLETE_BATCH_JOB,
+        REQUEST_SUSPEND_INT,
+        REQUEST_KILL_JOB,       /* 5032 */
+        REQUEST_KILL_JOBSTEP,
+        RESPONSE_JOB_ARRAY_ERRORS,
+        REQUEST_NETWORK_CALLERID,
+        RESPONSE_NETWORK_CALLERID,
+        REQUEST_STEP_COMPLETE_AGGR,
+
+        REQUEST_LAUNCH_TASKS = 6001,
+        RESPONSE_LAUNCH_TASKS,
+        MESSAGE_TASK_EXIT,
+        REQUEST_SIGNAL_TASKS,
+        REQUEST_CHECKPOINT_TASKS,
+        REQUEST_TERMINATE_TASKS,
+        REQUEST_REATTACH_TASKS,
+        RESPONSE_REATTACH_TASKS,
+        REQUEST_KILL_TIMELIMIT,
+        REQUEST_SIGNAL_JOB,
+        REQUEST_TERMINATE_JOB,
+        MESSAGE_EPILOG_COMPLETE,
+        REQUEST_ABORT_JOB,      /* job shouldn't be running, kill it without
+                                 * job/step/task complete responses */
+        REQUEST_FILE_BCAST,
+        TASK_USER_MANAGED_IO_STREAM,
+        REQUEST_KILL_PREEMPTED,
+
+        REQUEST_LAUNCH_PROLOG,
+        REQUEST_COMPLETE_PROLOG,
+        RESPONSE_PROLOG_EXECUTING,
+
+        SRUN_PING = 7001,
+        SRUN_TIMEOUT,
+        SRUN_NODE_FAIL,
+        SRUN_JOB_COMPLETE,
+        SRUN_USER_MSG,
+        SRUN_EXEC,
+        SRUN_STEP_MISSING,
+        SRUN_REQUEST_SUSPEND,
+        SRUN_STEP_SIGNAL,       /* for launch plugins aprun, poe and runjob,
+                                 * srun forwards signal to the launch command */
+
+        PMI_KVS_PUT_REQ = 7201,
+        PMI_KVS_PUT_RESP,
+        PMI_KVS_GET_REQ,
+        PMI_KVS_GET_RESP,
+
+        RESPONSE_SLURM_RC = 8001,
+        RESPONSE_SLURM_RC_MSG,
+
+        RESPONSE_FORWARD_FAILED = 9001,
+
+        ACCOUNTING_UPDATE_MSG = 10001,
+        ACCOUNTING_FIRST_REG,
+        ACCOUNTING_REGISTER_CTLD,
+
+        MESSAGE_COMPOSITE = 11001,
+        RESPONSE_MESSAGE_COMPOSITE,
+} slurm_msg_type_t;
+
+
+
+
+
+        case REQUEST_NODE_REGISTRATION_STATUS:
+		return "REQUEST_NODE_REGISTRATION_STATUS";
+	case MESSAGE_NODE_REGISTRATION_STATUS:
+		return "MESSAGE_NODE_REGISTRATION_STATUS";
+	case REQUEST_RECONFIGURE:
+		return "REQUEST_RECONFIGURE";
+	case RESPONSE_RECONFIGURE:
+		return "RESPONSE_RECONFIGURE";
+	case REQUEST_SHUTDOWN:
+		return "REQUEST_SHUTDOWN";
+	case REQUEST_SHUTDOWN_IMMEDIATE:
+		return "REQUEST_SHUTDOWN_IMMEDIATE";
+	case RESPONSE_SHUTDOWN:
+		return "RESPONSE_SHUTDOWN";
+	case REQUEST_PING:
+		return "REQUEST_PING";
+	case REQUEST_CONTROL:
+		return "REQUEST_CONTROL";
+	case REQUEST_SET_DEBUG_LEVEL:
+		return "REQUEST_SET_DEBUG_LEVEL";
+	case REQUEST_HEALTH_CHECK:
+		return "REQUEST_HEALTH_CHECK";
+	case REQUEST_TAKEOVER:
+		return "REQUEST_TAKEOVER";
+	case REQUEST_SET_SCHEDLOG_LEVEL:
+		return "REQUEST_SET_SCHEDLOG_LEVEL";
+	case REQUEST_SET_DEBUG_FLAGS:
+		return "REQUEST_SET_DEBUG_FLAGS";
+	case REQUEST_REBOOT_NODES:
+		return "REQUEST_REBOOT_NODES";
+	case RESPONSE_PING_SLURMD:
+		return "RESPONSE_PING_SLURMD";
+	case REQUEST_ACCT_GATHER_UPDATE:
+		return "REQUEST_ACCT_GATHER_UPDATE";
+	case RESPONSE_ACCT_GATHER_UPDATE:
+		return "RESPONSE_ACCT_GATHER_UPDATE";
+	case REQUEST_ACCT_GATHER_ENERGY:
+		return "REQUEST_ACCT_GATHER_ENERGY";
+	case RESPONSE_ACCT_GATHER_ENERGY:
+		return "RESPONSE_ACCT_GATHER_ENERGY";
+	case REQUEST_LICENSE_INFO:
+		return "REQUEST_LICENSE_INFO";
+	case RESPONSE_LICENSE_INFO:
+		return "RESPONSE_LICENSE_INFO";
+	case REQUEST_BUILD_INFO:
+		return "REQUEST_BUILD_INFO";
+	case RESPONSE_BUILD_INFO:
+		return "RESPONSE_BUILD_INFO";
+	case REQUEST_JOB_INFO:
+		return "REQUEST_JOB_INFO";
+	case RESPONSE_JOB_INFO:
+		return "RESPONSE_JOB_INFO";
+	case REQUEST_JOB_STEP_INFO:
+		return "REQUEST_JOB_STEP_INFO";
+	case RESPONSE_JOB_STEP_INFO:
+		return "RESPONSE_JOB_STEP_INFO";
+	case REQUEST_NODE_INFO:
+		return "REQUEST_NODE_INFO";
+	case RESPONSE_NODE_INFO:
+		return "RESPONSE_NODE_INFO";
+	case REQUEST_PARTITION_INFO:
+		return "REQUEST_PARTITION_INFO";
+	case RESPONSE_PARTITION_INFO:
+		return "RESPONSE_PARTITION_INFO";
+	case REQUEST_ACCTING_INFO:
+		return "REQUEST_ACCTING_INFO";
+	case RESPONSE_ACCOUNTING_INFO:
+		return "RESPONSE_ACCOUNTING_INFO";
+	case REQUEST_JOB_ID:
+		return "REQUEST_JOB_ID";
+	case RESPONSE_JOB_ID:
+		return "RESPONSE_JOB_ID";
+	case REQUEST_BLOCK_INFO:
+		return "REQUEST_BLOCK_INFO";
+	case RESPONSE_BLOCK_INFO:
+		return "RESPONSE_BLOCK_INFO";
+	case REQUEST_TRIGGER_SET:
+		return "REQUEST_TRIGGER_SET";
+	case REQUEST_TRIGGER_GET:
+		return "REQUEST_TRIGGER_GET";
+	case REQUEST_TRIGGER_CLEAR:
+		return "REQUEST_TRIGGER_CLEAR";
+	case RESPONSE_TRIGGER_GET:
+		return "RESPONSE_TRIGGER_GET";
+	case REQUEST_JOB_INFO_SINGLE:
+		return "REQUEST_JOB_INFO_SINGLE";
+	case REQUEST_SHARE_INFO:
+		return "REQUEST_SHARE_INFO";
+	case RESPONSE_SHARE_INFO:
+		return "RESPONSE_SHARE_INFO";
+	case REQUEST_RESERVATION_INFO:
+		return "REQUEST_RESERVATION_INFO";
+	case RESPONSE_RESERVATION_INFO:
+		return "RESPONSE_RESERVATION_INFO";
+	case REQUEST_LAYOUT_INFO:
+		return "REQUEST_LAYOUT_INFO";
+	case RESPONSE_LAYOUT_INFO:
+		return "RESPONSE_LAYOUT_INFO";
+	case REQUEST_PRIORITY_FACTORS:
+		return "REQUEST_PRIORITY_FACTORS";
+	case RESPONSE_PRIORITY_FACTORS:
+		return "RESPONSE_PRIORITY_FACTORS";
+	case REQUEST_TOPO_INFO:
+		return "REQUEST_TOPO_INFO";
+	case RESPONSE_TOPO_INFO:
+		return "RESPONSE_TOPO_INFO";
+	case REQUEST_TRIGGER_PULL:
+		return "REQUEST_TRIGGER_PULL";
+	case REQUEST_FRONT_END_INFO:
+		return "REQUEST_FRONT_END_INFO";
+	case RESPONSE_FRONT_END_INFO:
+		return "RESPONSE_FRONT_END_INFO";
+	case REQUEST_SPANK_ENVIRONMENT:
+		return "REQUEST_SPANK_ENVIRONMENT";
+	case RESPONCE_SPANK_ENVIRONMENT:
+		return "RESPONCE_SPANK_ENVIRONMENT";
+	case REQUEST_STATS_INFO:
+		return "REQUEST_STATS_INFO";
+	case RESPONSE_STATS_INFO:
+		return "RESPONSE_STATS_INFO";
+	case REQUEST_JOB_USER_INFO:
+		return "REQUEST_JOB_USER_INFO";
+	case REQUEST_NODE_INFO_SINGLE:
+		return "REQUEST_NODE_INFO_SINGLE";
+	case REQUEST_UPDATE_JOB:
+		return "REQUEST_UPDATE_JOB";
+	case REQUEST_UPDATE_NODE:
+		return "REQUEST_UPDATE_NODE";
+	case REQUEST_UPDATE_LAYOUT:
+		return "REQUEST_UPDATE_LAYOUT";
+	case REQUEST_CREATE_PARTITION:
+		return "REQUEST_CREATE_PARTITION";
+	case REQUEST_DELETE_PARTITION:
+		return "REQUEST_DELETE_PARTITION";
+	case REQUEST_UPDATE_PARTITION:
+		return "REQUEST_UPDATE_PARTITION";
+	case REQUEST_CREATE_RESERVATION:
+		return "REQUEST_CREATE_RESERVATION";
+	case RESPONSE_CREATE_RESERVATION:
+		return "RESPONSE_CREATE_RESERVATION";
+	case REQUEST_DELETE_RESERVATION:
+		return "REQUEST_DELETE_RESERVATION";
+	case REQUEST_UPDATE_RESERVATION:
+		return "REQUEST_UPDATE_RESERVATION";
+	case REQUEST_UPDATE_BLOCK:
+		return "REQUEST_UPDATE_BLOCK";
+	case REQUEST_UPDATE_FRONT_END:
+		return "REQUEST_UPDATE_FRONT_END";
+	case REQUEST_RESOURCE_ALLOCATION:
+		return "REQUEST_RESOURCE_ALLOCATION";
+	case RESPONSE_RESOURCE_ALLOCATION:
+		return "RESPONSE_RESOURCE_ALLOCATION";
+	case REQUEST_SUBMIT_BATCH_JOB:
+		return "REQUEST_SUBMIT_BATCH_JOB";
+	case RESPONSE_SUBMIT_BATCH_JOB:
+		return "RESPONSE_SUBMIT_BATCH_JOB";
+	case REQUEST_BATCH_JOB_LAUNCH:
+		return "REQUEST_BATCH_JOB_LAUNCH";
+	case REQUEST_CANCEL_JOB:
+		return "REQUEST_CANCEL_JOB";
+	case RESPONSE_CANCEL_JOB:
+		return "RESPONSE_CANCEL_JOB";
+	case REQUEST_JOB_RESOURCE:
+		return "REQUEST_JOB_RESOURCE";
+	case RESPONSE_JOB_RESOURCE:
+		return "RESPONSE_JOB_RESOURCE";
+	case REQUEST_JOB_ATTACH:
+		return "REQUEST_JOB_ATTACH";
+	case RESPONSE_JOB_ATTACH:
+		return "RESPONSE_JOB_ATTACH";
+	case REQUEST_JOB_WILL_RUN:
+		return "REQUEST_JOB_WILL_RUN";
+	case RESPONSE_JOB_WILL_RUN:
+		return "RESPONSE_JOB_WILL_RUN";
+	case REQUEST_JOB_ALLOCATION_INFO:
+		return "REQUEST_JOB_ALLOCATION_INFO";
+	case RESPONSE_JOB_ALLOCATION_INFO:
+		return "RESPONSE_JOB_ALLOCATION_INFO";
+	case REQUEST_JOB_ALLOCATION_INFO_LITE:
+		return "REQUEST_JOB_ALLOCATION_INFO_LITE";
+	case RESPONSE_JOB_ALLOCATION_INFO_LITE:
+		return "RESPONSE_JOB_ALLOCATION_INFO_LITE";
+	case REQUEST_UPDATE_JOB_TIME:
+		return "REQUEST_UPDATE_JOB_TIME";
+	case REQUEST_JOB_READY:
+		return "REQUEST_JOB_READY";
+	case RESPONSE_JOB_READY:
+		return "RESPONSE_JOB_READY";
+	case REQUEST_JOB_END_TIME:
+		return "REQUEST_JOB_END_TIME";
+	case REQUEST_JOB_NOTIFY:
+		return "REQUEST_JOB_NOTIFY";
+	case REQUEST_JOB_SBCAST_CRED:
+		return "REQUEST_JOB_SBCAST_CRED";
+	case RESPONSE_JOB_SBCAST_CRED:
+		return "RESPONSE_JOB_SBCAST_CRED";
+	case REQUEST_JOB_STEP_CREATE:
+		return "REQUEST_JOB_STEP_CREATE";
+	case RESPONSE_JOB_STEP_CREATE:
+		return "RESPONSE_JOB_STEP_CREATE";
+	case REQUEST_RUN_JOB_STEP:
+		return "REQUEST_RUN_JOB_STEP";
+	case RESPONSE_RUN_JOB_STEP:
+		return "RESPONSE_RUN_JOB_STEP";
+	case REQUEST_CANCEL_JOB_STEP:
+		return "REQUEST_CANCEL_JOB_STEP";
+	case RESPONSE_CANCEL_JOB_STEP:
+		return "RESPONSE_CANCEL_JOB_STEP";
+	case REQUEST_UPDATE_JOB_STEP:
+		return "REQUEST_UPDATE_JOB_STEP";
+	case DEFUNCT_RESPONSE_COMPLETE_JOB_STEP:
+		return "DEFUNCT_RESPONSE_COMPLETE_JOB_STEP";
+	case REQUEST_CHECKPOINT:
+		return "REQUEST_CHECKPOINT";
+	case RESPONSE_CHECKPOINT:
+		return "RESPONSE_CHECKPOINT";
+	case REQUEST_CHECKPOINT_COMP:
+		return "REQUEST_CHECKPOINT_COMP";
+	case REQUEST_CHECKPOINT_TASK_COMP:
+		return "REQUEST_CHECKPOINT_TASK_COMP";
+	case RESPONSE_CHECKPOINT_COMP:
+		return "RESPONSE_CHECKPOINT_COMP";
+	case REQUEST_SUSPEND:
+		return "REQUEST_SUSPEND";
+	case RESPONSE_SUSPEND:
+		return "RESPONSE_SUSPEND";
+	case REQUEST_STEP_COMPLETE:
+		return "REQUEST_STEP_COMPLETE";
+	case REQUEST_STEP_COMPLETE_AGGR:
+		return "REQUEST_STEP_COMPLETE_AGGR";
+	case REQUEST_COMPLETE_JOB_ALLOCATION:
+		return "REQUEST_COMPLETE_JOB_ALLOCATION";
+	case REQUEST_COMPLETE_BATCH_SCRIPT:
+		return "REQUEST_COMPLETE_BATCH_SCRIPT";
+	case REQUEST_JOB_STEP_STAT:
+		return "REQUEST_JOB_STEP_STAT";
+	case RESPONSE_JOB_STEP_STAT:
+		return "RESPONSE_JOB_STEP_STAT";
+	case REQUEST_STEP_LAYOUT:
+		return "REQUEST_STEP_LAYOUT";
+	case RESPONSE_STEP_LAYOUT:
+		return "RESPONSE_STEP_LAYOUT";
+	case REQUEST_JOB_REQUEUE:
+		return "REQUEST_JOB_REQUEUE";
+	case REQUEST_DAEMON_STATUS:
+		return "REQUEST_DAEMON_STATUS";
+	case RESPONSE_SLURMD_STATUS:
+		return "RESPONSE_SLURMD_STATUS";
+	case RESPONSE_SLURMCTLD_STATUS:
+		return "RESPONSE_SLURMCTLD_STATUS";
+	case REQUEST_JOB_STEP_PIDS:
+		return "REQUEST_JOB_STEP_PIDS";
+	case RESPONSE_JOB_STEP_PIDS:
+		return "RESPONSE_JOB_STEP_PIDS";
+	case REQUEST_FORWARD_DATA:
+		return "REQUEST_FORWARD_DATA";
+	case REQUEST_COMPLETE_BATCH_JOB:
+		return "REQUEST_COMPLETE_BATCH_JOB";
+	case REQUEST_SUSPEND_INT:
+		return "REQUEST_SUSPEND_INT";
+	case REQUEST_KILL_JOB:
+		return "REQUEST_KILL_JOB";
+	case REQUEST_LAUNCH_TASKS:
+		return "REQUEST_LAUNCH_TASKS";
+	case RESPONSE_LAUNCH_TASKS:
+		return "RESPONSE_LAUNCH_TASKS";
+	case MESSAGE_TASK_EXIT:
+		return "MESSAGE_TASK_EXIT";
+	case REQUEST_SIGNAL_TASKS:
+		return "REQUEST_SIGNAL_TASKS";
+	case REQUEST_CHECKPOINT_TASKS:
+		return "REQUEST_CHECKPOINT_TASKS";
+	case REQUEST_TERMINATE_TASKS:
+		return "REQUEST_TERMINATE_TASKS";
+	case REQUEST_REATTACH_TASKS:
+		return "REQUEST_REATTACH_TASKS";
+	case RESPONSE_REATTACH_TASKS:
+		return "RESPONSE_REATTACH_TASKS";
+	case REQUEST_KILL_TIMELIMIT:
+		return "REQUEST_KILL_TIMELIMIT";
+	case REQUEST_SIGNAL_JOB:
+		return "REQUEST_SIGNAL_JOB";
+	case REQUEST_TERMINATE_JOB:
+		return "REQUEST_TERMINATE_JOB";
+	case MESSAGE_EPILOG_COMPLETE:
+		return "MESSAGE_EPILOG_COMPLETE";
+	case REQUEST_ABORT_JOB:
+		return "REQUEST_ABORT_JOB";
+	case REQUEST_FILE_BCAST:
+		return "REQUEST_FILE_BCAST";
+	case TASK_USER_MANAGED_IO_STREAM:
+		return "TASK_USER_MANAGED_IO_STREAM";
+	case REQUEST_KILL_PREEMPTED:
+		return "REQUEST_KILL_PREEMPTED";
+	case REQUEST_LAUNCH_PROLOG:
+		return "REQUEST_LAUNCH_PROLOG";
+	case REQUEST_COMPLETE_PROLOG:
+		return "REQUEST_COMPLETE_PROLOG";
+	case RESPONSE_PROLOG_EXECUTING:
+		return "RESPONSE_PROLOG_EXECUTING";
+	case SRUN_PING:
+		return "SRUN_PING";
+	case SRUN_TIMEOUT:
+		return "SRUN_TIMEOUT";
+	case SRUN_NODE_FAIL:
+		return "SRUN_NODE_FAIL";
+	case SRUN_JOB_COMPLETE:
+		return "SRUN_JOB_COMPLETE";
+	case SRUN_USER_MSG:
+		return "SRUN_USER_MSG";
+	case SRUN_EXEC:
+		return "SRUN_EXEC";
+	case SRUN_STEP_MISSING:
+		return "SRUN_STEP_MISSING";
+	case SRUN_REQUEST_SUSPEND:
+		return "SRUN_REQUEST_SUSPEND";
+	case SRUN_STEP_SIGNAL:
+		return "SRUN_STEP_SIGNAL";
+	case PMI_KVS_PUT_REQ:
+		return "PMI_KVS_PUT_REQ";
+	case PMI_KVS_PUT_RESP:
+		return "PMI_KVS_PUT_RESP";
+	case PMI_KVS_GET_REQ:
+		return "PMI_KVS_GET_REQ";
+	case PMI_KVS_GET_RESP:
+		return "PMI_KVS_GET_RESP";
+	case RESPONSE_SLURM_RC:
+		return "RESPONSE_SLURM_RC";
+	case RESPONSE_SLURM_RC_MSG:
+		return "RESPONSE_SLURM_RC_MSG";
+	case RESPONSE_FORWARD_FAILED:
+		return "RESPONSE_FORWARD_FAILED";
+	case ACCOUNTING_UPDATE_MSG:
+		return "ACCOUNTING_UPDATE_MSG";
+	case ACCOUNTING_FIRST_REG:
+		return "ACCOUNTING_FIRST_REG";
+	case ACCOUNTING_REGISTER_CTLD:
+		return "ACCOUNTING_REGISTER_CTLD";
+	case MESSAGE_COMPOSITE:
+		return "MESSAGE_COMPOSITE";
+	case RESPONSE_MESSAGE_COMPOSITE:
+		return "RESPONSE_MESSAGE_COMPOSITE";
+	case REQUEST_BURST_BUFFER_INFO:
+		return "REQUEST_BURST_BUFFER_INFO";
+	case RESPONSE_BURST_BUFFER_INFO:
+		return "RESPONSE_BURST_BUFFER_INFO";

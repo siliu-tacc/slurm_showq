@@ -1,0 +1,39 @@
+#-------------------------------------------------------------------------
+# TACC derived LSF Utilities
+# 
+# 1. lsf_query_user:   queries total number of queued jobs for a given user
+# 2. lsf_showq:        an LSF derived version of showq                   
+# 3. lsf_query_acct:   queries accounting info for desired time window
+# 4. lsf_monitor_laod: monitor status of each node
+#
+# ks. 12/11/03
+#-------------------------------------------------------------------------
+
+.SUFFIXES: .o .c .f .a
+
+CFLAGS       := -O3
+ARCHIVE      = ar
+ARFLAGS      = rv
+LIBDIRS      = #-L /usr/lib
+LIBS	     = #-lnsl /opt/lsf/5.1/linux2.4-glibc2.2-x86/lib/libbat.a \
+	       /opt/lsf/5.1/linux2.4-glibc2.2-x86/lib/liblsf.a 
+#LIBARG       = -L /home/karl/bin/lib/ -l argtable2
+#LIBARG       = /home1/00161/karl/bin/argtable-2.13/lib/libargtable2.a -lslurm
+LIBARG       = -lslurm
+INCDIRS      = -I./
+
+#-------------------------
+# Executable dependencies
+#-------------------------
+
+all: slurm_showq 
+
+slurm_showq: slurm_showq.C main.cpp
+	g++ $(CFLAGS) $(INCDIRS) $(LIBDIRS) \
+	-o slurm_showq slurm_showq.C main.cpp $(LIBS) $(LIBARG)
+
+clean:
+	rm slurm_showq
+
+
+

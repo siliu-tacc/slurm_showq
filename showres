@@ -1,0 +1,88 @@
+#!/bin/bash
+
+#Showres: show summary of reservation status (Slurm version)
+#Author: Si Liu (siliu@tacc.utexas.edu)
+#Author: Niall Gaffney (ngaffney@tacc.utexas.edu)
+#Last modified: Aug 18, 2015
+
+OPTIND=1
+all=0           #Whether check all reservations
+myself=1        #Whether check my own reservations
+TheUser=${USER}
+
+currenthost=`hostname -f`
+if [[ $currenthost == *"ls5"* ]] 
+then
+#	echo "Lonestar 5"
+	SCONTROL_CMD="/opt/slurm/default/bin/scontrol"
+else
+#	echo "other systems"
+	SCONTROL_CMD="/usr/bin/scontrol"
+fi
+
+
+while getopts "ahu:" opt; do
+     case "$opt" in
+     a) all=1
+        break
+        ;;
+     u)
+        TheUser=$OPTARG
+        ;;
+     h)
+        echo "Usage: $0 [OPTION] "
+        echo "list current reservations in a clean format:"
+        echo "    -a : list reservation(s) for all users on system"
+        echo "    -u : list reservation(s) for a specific user" 
+        echo "    -h : prints this message"
+        exit 0
+        ;;
+     \?)
+        echo "Usage: $0 [OPTION] "
+        echo "list current reservations in a clean format:"
+        echo "    -a : list reservation(s) for all users on system"
+        echo "    -u : list reservation(s) for a specific user" 
+        echo "    -h : prints this message"
+        exit 0
+        ;;
+     esac
+done
+
+if [ $all == 1 ]
+then
+        res_info=`$SCONTROL_CMD -o show res`
+else
+        res_info=`$SCONTROL_CMD -o show res | /bin/grep --word-regexp ${TheUser}`
+fi
+
+if [ -z "$res_info" ]
+then
+        echo "No reservation found!"
+        exit 0
+fi
+
+if [ "$res_info" == "No reservations in the system" ]
+then
+        echo "No reservation found!"
+        exit 0
+fi
+
+#Si should merge the "no reservation check into the commands below!
+
+if [ $all == 1 ]
+then
+$SCONTROL_CMD -o show res |  /bin/awk '\
+        BEGIN {FS="=| "; \
+         printf "%-23s %9s %12s %7s %12s %12s %9s\n", \
+        "Reservation Name", "State", "Queue", "#Nodes", "Start Time", "End time", "Duration"} \
+        {printf("%-23s %9s %12s %7s %12s %12s %9s\n",  substr($2,0,23), $31, $18, $12, substr($4,6,11), substr($6,6,11), substr($8,0,length($8)-3) ) }'
+else
+$SCONTROL_CMD -o show res | grep --word-regexp ${TheUser} | /bin/awk '\
+        BEGIN {FS="=| "; \
+         printf "%-23s %9s %12s %7s %12s %12s %9s\n", \
+        "Reservation Name", "State", "Queue", "#Nodes", "Start Time", "End time", "Duration"} \
+        {printf("%-23s %9s %12s %7s %12s %12s %9s\n", substr($2,0,23), $31, $18, $12, substr($4,6,11), substr($4,6,11), substr($8,0,length($8)-3) )}'
+fi
+
+
+
