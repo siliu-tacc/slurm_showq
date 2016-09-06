@@ -35,6 +35,6 @@ int main(int argc, char **argv)
   sq.parse_supported_options(argc,argv);
   sq.query_running_jobs();
 
+  sq.check_maintenance();
   return(0);
 }
-  

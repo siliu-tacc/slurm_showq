@@ -54,7 +54,7 @@ class Slurm_Showq {
   Slurm_Showq();
   void query_running_jobs();
   void parse_supported_options(int argc, char *argv[]);
-
+  void check_maintenance();
 
 private:
 

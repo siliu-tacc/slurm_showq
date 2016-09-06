@@ -23,11 +23,21 @@
 // Karl W. Schulz- Texas Advanced Computing Center (karl@tacc.utexas.edu)
 //
 //
-// Last update: Si Liu on 1/5/2015
+// Last update: Si Liu on 5/18/2016
 // $Id: slurm_showq.cpp 2015-01-05  siliu $
 //-------------------------------------------------------------------------*/ 
 
 #include "slurm_showq.h"
+#include <stdio.h>
+#include <stdio.h>
+
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
 void Slurm_Showq::query_running_jobs()
 {
@@ -717,7 +727,9 @@ void Slurm_Showq::query_running_jobs()
 
   slurm_free_job_info_msg(job_ptr);
 
-  exit(0);
+
+//More work to do
+//  exit(0);
 
 }
 
@@ -1018,8 +1030,32 @@ Slurm_Showq::Slurm_Showq()
   progname           = "slurm_showq";
 
   // read additional runtime settings from config file if present
+  const char *showq_conf;   
+  showq_conf=getenv("TACC_SHOWQ_CONF");
 
-  read_runtime_config("showq.conf");
+  if(showq_conf)
+	{
+        printf("The following showq configuration file is used:\n%s\n\n",showq_conf);
+        read_runtime_config(showq_conf);
+  	}
+  else
+	{
+        printf("No additional configuration file is found.\nThe system default one is used.\n\n");
+        read_runtime_config("showq.conf");
+        }
 
   return;
+}
+
+void Slurm_Showq::check_maintenance()
+{
+    if (system("scontrol show reservation | grep -i maintenance > /dev/null")==0)
+    	{
+	printf(ANSI_COLOR_RED "\n--------------------------------- PLEASE NOTE: ----------------------------------\n" ANSI_COLOR_RESET);
+    	printf(ANSI_COLOR_MAGENTA "The following system maintenance has been scheduled:\n" );
+	system("scontrol show reservation | grep -i maintenance");
+	printf("\nJobs that cannot finish before a scheduled maintenance will not start until maintenance is complete.\n" );
+	printf("The status for such jobs will show as \"WaitNod\" in showq and \"ReqNodeNotAvail\" in squeue.\n"); 	
+	printf(ANSI_COLOR_RED "---------------------------------------------------------------------------------\n" ANSI_COLOR_RESET "\n");
+	}
 }

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-target=slurmshowq-1.1
+target=slurmshowq-1.6
 
 currenthost=`hostname -f`
 if [[ $currenthost == *"ls5"* ]]
 then
 #Lonestar Only
-	SLURM_LIB=/opt/slurm/15.08.5/lib64
-	SLURM_INCLUDE=/opt/slurm/15.08.5/include
+	SLURM_LIB=/opt/slurm/default/lib64
+	SLURM_INCLUDE=/opt/slurm/default/include
 else
 #Stampede, Maverick, or Wrangler
 	SLURM_LIB=/usr/lib64
@@ -33,7 +33,7 @@ then
 	cp showres ../slurm_showq_15_LS5/${target}
 	cp timestamp ../slurm_showq_15_LS5/${target}
 	cd ../slurm_showq_15_LS5
-	tar czf ${target}.tar.gz ${target}
+	tar cvjSf ${target}.tar.gz ${target}
 	chmod 755 ${target}.tar.gz 
 else
 	mkdir -p ../slurm_showq_15_SP/${target}
@@ -41,8 +41,6 @@ else
         cp showres ../slurm_showq_15_SP/${target}
 	cp timestamp ../slurm_showq_15_SP/${target}
         cd ../slurm_showq_15_SP   
-        tar czf ${target}.tar.gz ${target}
+        tar cvjSf ${target}.tar.gz ${target}
         chmod 755 ${target}.tar.gz
 fi
-
-

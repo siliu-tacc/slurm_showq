@@ -3,7 +3,9 @@
 #Showres: show summary of reservation status (Slurm version)
 #Author: Si Liu (siliu@tacc.utexas.edu)
 #Author: Niall Gaffney (ngaffney@tacc.utexas.edu)
-#Last modified: Aug 18, 2015
+#Last modified: May 18, 2016
+
+
 
 OPTIND=1
 all=0           #Whether check all reservations
@@ -81,7 +83,7 @@ $SCONTROL_CMD -o show res | grep --word-regexp ${TheUser} | /bin/awk '\
         BEGIN {FS="=| "; \
          printf "%-23s %9s %12s %7s %12s %12s %9s\n", \
         "Reservation Name", "State", "Queue", "#Nodes", "Start Time", "End time", "Duration"} \
-        {printf("%-23s %9s %12s %7s %12s %12s %9s\n", substr($2,0,23), $31, $18, $12, substr($4,6,11), substr($4,6,11), substr($8,0,length($8)-3) )}'
+        {printf("%-23s %9s %12s %7s %12s %12s %9s\n", substr($2,0,23), $31, $18, $12, substr($4,6,11), substr($6,6,11), substr($8,0,length($8)-3) )}'
 fi
 
 
