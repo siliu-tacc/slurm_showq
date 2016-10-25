@@ -20,11 +20,13 @@
 //
 // Originally: 7/29/2012 (refactor of original LSF version)
 //
-// Karl W. Schulz- Texas Advanced Computing Center (karl@tacc.utexas.edu)
+// Karl W. Schulz (Texas Advanced Computing Center)
+// 
+// Author:
+// Karl W. Schulz, Si Liu (Texas Advanced Computing Center)
 //
-//
-// Last update: Si Liu on 5/18/2016
-// $Id: slurm_showq.cpp 2015-01-05  siliu $
+// Last update: Si Liu on 10/18/2016
+// $Id: slurm_showq.cpp 2015-10-18  siliu $
 //-------------------------------------------------------------------------*/ 
 
 #include "slurm_showq.h"
@@ -962,35 +964,49 @@ void Slurm_Showq::print_version()
 // read_runtime_config()
 //----------------------------------------------------------------- 
 
-void Slurm_Showq::read_runtime_config(std::string config_file)
+void Slurm_Showq::read_runtime_config(std::string config_file, bool conf_sm)
 {
+  FILE *fp;
+  std::string ifile;  
 
-  // determine where binary is being run from
+  if(conf_sm)  
+  {
+    // determine where binary is being run from
+    string exe = get_executable_path();
 
-  string exe = get_executable_path();
+    char *exe_tmp = new char[exe.size() + 1];
+    std::copy(exe.begin(),exe.end(),exe_tmp);
 
-  char *exe_tmp = new char[exe.size() + 1];
-  std::copy(exe.begin(),exe.end(),exe_tmp);
+    exe_tmp[exe.size()] = '\0';
+    ifile=dirname(exe_tmp);
 
-  exe_tmp[exe.size()] = '\0';
-
-  std::string ifile(dirname(exe_tmp));
-
-  delete [] exe_tmp;
+    delete [] exe_tmp;
   
-  ifile += "/" + config_file;
+    ifile += "/" + config_file;
+  }
+  else
+  {
+    ifile=config_file; 
+  }  
 
-  FILE *fp = fopen(ifile.c_str(),"r");
+  fp=fopen(config_file.c_str(),"r");
+
 
   if(fp == NULL)
+    {
+    printf("\n\n Warning: can not open/load configuration file!\n\n");
     return;
+    }
   else
       {
 	GetPot parse(ifile.c_str(),"#","\n");
 	//parse.print();
 
 	if(parse.size() <= 1)   // empty config file
+	  {
+          printf("\n\n Warning: empty configuration file!\n\n");
 	  return;		
+          }
 
 	int num_hosts = parse("hosts_available",0);
 
@@ -1024,6 +1040,7 @@ Slurm_Showq::Slurm_Showq()
   named_user_jobs_only = false;
   show_all_reserv  = false;
   show_utilization = false;
+  
 
   RES_LEAD_WINDOW = 24*7*3600;	// 7-day lead time
 
@@ -1036,13 +1053,13 @@ Slurm_Showq::Slurm_Showq()
   if(showq_conf)
 	{
         printf("The following showq configuration file is used:\n%s\n\n",showq_conf);
-        read_runtime_config(showq_conf);
+        read_runtime_config(showq_conf, false);  //use TACC customized showq_conf
   	}
   else
 	{
         printf("No additional configuration file is found.\nThe system default one is used.\n\n");
-        read_runtime_config("showq.conf");
-        }
+        read_runtime_config("showq.conf", true); //use the showq_conf (where the binary is)
+	}
 
   return;
 }
