@@ -26,7 +26,7 @@
 // Karl W. Schulz, Si Liu (Texas Advanced Computing Center)
 //
 // Last update: Si Liu on 10/18/2016
-// $Id: slurm_showq.cpp 2015-10-18  siliu $
+// $Id: slurm_showq.cpp 2016-10-18  siliu $
 //-------------------------------------------------------------------------*/ 
 
 #include "slurm_showq.h"

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This script is used for TACC people to compile showq and showres on TACC systems
+# Author: Si Liu
+# Texas Advanced Computing Center
+
 target=slurmshowq-1.6
 
 currenthost=`hostname -f`
