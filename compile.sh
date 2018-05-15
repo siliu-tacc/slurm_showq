@@ -4,7 +4,7 @@
 # Author: Si Liu
 # Texas Advanced Computing Center
 
-target=slurmshowq-1.6
+target=slurmshowq-1.7
 
 currenthost=`hostname -f`
 if [[ $currenthost == *"ls5"* ]]

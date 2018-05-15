@@ -20,26 +20,14 @@
 //
 // Originally: 7/29/2012 (refactor of original LSF version)
 //
-// Karl W. Schulz (Texas Advanced Computing Center)
-// 
-// Author:
-// Karl W. Schulz, Si Liu (Texas Advanced Computing Center)
+// Karl W. Schulz- Texas Advanced Computing Center (karl@tacc.utexas.edu)
 //
-// Last update: Si Liu on 10/18/2016
-// $Id: slurm_showq.cpp 2016-10-18  siliu $
+//
+// Last update: Si Liu on 5/18/2016
+// $Id: slurm_showq.cpp 2015-01-05  siliu $
 //-------------------------------------------------------------------------*/ 
 
 #include "slurm_showq.h"
-#include <stdio.h>
-#include <stdio.h>
-
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
 
 void Slurm_Showq::query_running_jobs()
 {
@@ -135,12 +123,12 @@ void Slurm_Showq::query_running_jobs()
       printf("ACTIVE JOBS--------------------\n");
       if(long_listing)
 	{
-	  printf("JOBID     JOBNAME    USERNAME      STATE   CORE   NODE QUEUE         REMAINING  STARTTIME\n");
+	  printf("JOBID     JOBNAME    USERNAME      STATE   CORES  NODES QUEUE          REMAINING STARTTIME\n");
 	  printf("===================================================================================================\n");
 	}
       else
 	{
-	  printf("JOBID     JOBNAME    USERNAME      STATE   CORE   REMAINING  STARTTIME\n");
+	  printf("JOBID     JOBNAME    USERNAME      STATE   NODES REMAINING STARTTIME\n");
 	  printf("================================================================================\n");
 	}
 
@@ -233,13 +221,21 @@ void Slurm_Showq::query_running_jobs()
 	  strncpy(jobuser_short,uid_to_string(job->user_id).c_str(),14);
 	  jobuser_short[14] = '\0';
 	  printf("%-14s", jobuser_short);
-
+          
 	  printf("%-8s","Running");
-	  printf("%-6i ",job->num_cpus);;
+	  
+	  if(long_listing)
+		{
+		printf("%-6i ",job->num_cpus);;
+		}
 
+          //print node number
+          printf("%-5i",job->num_nodes);
+
+          //print queue
 	  if(long_listing)
 	    {
-	      printf("%-4i",job->num_nodes);
+	      //printf("%-4i",job->num_nodes);
 	      //printf("%-4i",6000);
 	      strncpy(queuename_short,job->partition,14);
 	      queuename_short[14] = '\0';
@@ -307,12 +303,12 @@ void Slurm_Showq::query_running_jobs()
       printf("\nWAITING JOBS------------------------\n");
       if(long_listing)
 	{
-	  printf("JOBID     JOBNAME    USERNAME      STATE   CORE  HOST  QUEUE           WCLIMIT  QUEUETIME\n");
-	  printf("=======================================================================-===========================\n");
+	  printf("JOBID     JOBNAME    USERNAME      STATE   CORES NODES QUEUE          WCLIMIT   QUEUETIME\n");
+	  printf("==================================================================================================\n");
 	}
       else
 	{
-	  printf("JOBID     JOBNAME    USERNAME      STATE   CORE     WCLIMIT  QUEUETIME\n");
+	  printf("JOBID     JOBNAME    USERNAME      STATE   NODES WCLIMIT   QUEUETIME\n");
 	  printf("================================================================================\n");
 	}
 
@@ -382,14 +378,19 @@ void Slurm_Showq::query_running_jobs()
 	  printf("%-14s", jobuser_short);
 
 	  printf("%-8s","Waiting");
-	  printf("%-6i ",job->num_cpus);
+
+          if(long_listing)
+		{
+		printf("%-5i ",job->num_cpus);
+		}	  
+	  printf("%-5i",job->num_nodes);
 
 	  if(long_listing)
 	    {
-	      printf("%-4i ",job->num_nodes);
+//	      printf("%-4i ",job->num_nodes);
 	      strncpy(queuename_short,job->partition,14);
 	      queuename_short[14] = '\0';
-	      printf("%-14s",queuename_short); 
+	      printf(" %-14s",queuename_short); 
 	    }
 
 	  secs_max     = job->time_limit*60; // max runtime (converted to secs)
@@ -428,12 +429,12 @@ void Slurm_Showq::query_running_jobs()
       printf("\nBLOCKED JOBS--\n");
       if(long_listing)
 	{
-	  printf("JOBID     JOBNAME    USERNAME      STATE   CORE  HOST  QUEUE           WCLIMIT  QUEUETIME\n");
-	  printf("=======================================================================-===========================\n");
+	  printf("JOBID     JOBNAME    USERNAME      STATE   CORES  NODES QUEUE          WCLIMIT   QUEUETIME\n");
+	  printf("==================================================================================================\n");
 	}
       else
 	{
-	  printf("JOBID     JOBNAME    USERNAME      STATE   CORE     WCLIMIT  QUEUETIME\n");
+	  printf("JOBID     JOBNAME    USERNAME      STATE   NODES WCLIMIT   QUEUETIME\n");
 	  printf("================================================================================\n");
 	}
 
@@ -528,15 +529,19 @@ void Slurm_Showq::query_running_jobs()
 		printf("%-8s","Blocked");
 		break;
 	  }
-	  
-	  printf("%-6i ",job->num_cpus);
+	 
+          if(long_listing)
+		{
+		printf("%-6i ",job->num_cpus);
+		}
+          
+          printf("%-5i",job->num_nodes);
 
 	  if(long_listing)
 	    {
-	      printf("%-4i ",job->num_nodes);
 	      strncpy(queuename_short,job->partition,14);
 	      queuename_short[14] = '\0';
-	      printf("%-14s",queuename_short); 
+	      printf(" %-14s",queuename_short); 
 	    }
 
 	  secs_max     = job->time_limit*60; // max runtime (converted to secs)
@@ -577,7 +582,7 @@ void Slurm_Showq::query_running_jobs()
     {
       //printf("errored job size %d\n", errored_jobs.size());
       printf("\nCOMPLETING/ERRORED JOBS-------------\n");
-      printf("JOBID     JOBNAME    USERNAME      STATE   CORE     WCLIMIT  QUEUETIME\n");
+      printf("JOBID     JOBNAME    USERNAME      STATE   NODES   WCLIMIT  QUEUETIME\n");
       printf("================================================================================\n");
 
       for(int i=0; i<errored_jobs.size();i++)
@@ -642,7 +647,7 @@ void Slurm_Showq::query_running_jobs()
 		break;
 	  } 
 
-	  printf("%-6i ",job->num_cpus);
+          printf("%-5i ",job->num_nodes);
 
 	  if (hours_remain>0)
 	  {
@@ -964,49 +969,35 @@ void Slurm_Showq::print_version()
 // read_runtime_config()
 //----------------------------------------------------------------- 
 
-void Slurm_Showq::read_runtime_config(std::string config_file, bool conf_sm)
+void Slurm_Showq::read_runtime_config(std::string config_file)
 {
-  FILE *fp;
-  std::string ifile;  
 
-  if(conf_sm)  
-  {
-    // determine where binary is being run from
-    string exe = get_executable_path();
+  // determine where binary is being run from
 
-    char *exe_tmp = new char[exe.size() + 1];
-    std::copy(exe.begin(),exe.end(),exe_tmp);
+  string exe = get_executable_path();
 
-    exe_tmp[exe.size()] = '\0';
-    ifile=dirname(exe_tmp);
+  char *exe_tmp = new char[exe.size() + 1];
+  std::copy(exe.begin(),exe.end(),exe_tmp);
 
-    delete [] exe_tmp;
+  exe_tmp[exe.size()] = '\0';
+
+  std::string ifile(dirname(exe_tmp));
+
+  delete [] exe_tmp;
   
-    ifile += "/" + config_file;
-  }
-  else
-  {
-    ifile=config_file; 
-  }  
+  ifile += "/" + config_file;
 
-  fp=fopen(config_file.c_str(),"r");
-
+  FILE *fp = fopen(ifile.c_str(),"r");
 
   if(fp == NULL)
-    {
-    printf("\n\n Warning: can not open/load configuration file!\n\n");
     return;
-    }
   else
       {
 	GetPot parse(ifile.c_str(),"#","\n");
 	//parse.print();
 
 	if(parse.size() <= 1)   // empty config file
-	  {
-          printf("\n\n Warning: empty configuration file!\n\n");
 	  return;		
-          }
 
 	int num_hosts = parse("hosts_available",0);
 
@@ -1040,39 +1031,50 @@ Slurm_Showq::Slurm_Showq()
   named_user_jobs_only = false;
   show_all_reserv  = false;
   show_utilization = false;
-  
 
   RES_LEAD_WINDOW = 24*7*3600;	// 7-day lead time
 
   progname           = "slurm_showq";
 
   // read additional runtime settings from config file if present
-  const char *showq_conf;   
-  showq_conf=getenv("TACC_SHOWQ_CONF");
 
-  if(showq_conf)
-	{
-        printf("The following showq configuration file is used:\n%s\n\n",showq_conf);
-        read_runtime_config(showq_conf, false);  //use TACC customized showq_conf
-  	}
-  else
-	{
-        printf("No additional configuration file is found.\nThe system default one is used.\n\n");
-        read_runtime_config("showq.conf", true); //use the showq_conf (where the binary is)
-	}
+  read_runtime_config("showq.conf");
 
   return;
 }
 
 void Slurm_Showq::check_maintenance()
 {
-    if (system("scontrol show reservation | grep -i maintenance > /dev/null")==0)
+  string maintenance_info;  
+  if (system("scontrol show reservation | grep -i maintenance > /dev/null")==0)
     	{
-	printf(ANSI_COLOR_RED "\n--------------------------------- PLEASE NOTE: ----------------------------------\n" ANSI_COLOR_RESET);
-    	printf(ANSI_COLOR_MAGENTA "The following system maintenance has been scheduled:\n" );
-	system("scontrol show reservation | grep -i maintenance");
-	printf("\nJobs that cannot finish before a scheduled maintenance will not start until maintenance is complete.\n" );
-	printf("The status for such jobs will show as \"WaitNod\" in showq and \"ReqNodeNotAvail\" in squeue.\n"); 	
-	printf(ANSI_COLOR_RED "---------------------------------------------------------------------------------\n" ANSI_COLOR_RESET "\n");
+        printf("\n\n-------------------- WARNING ! --------------------\n\n");
+    	printf("The following system maintenance has been scheduled:\n");
+        maintenance_info=GetStdoutFromCommand("scontrol show reservation | grep -i maintenance");
+	printf("%s", maintenance_info.c_str());
+        printf("\nYour jobs may only be scheduled to run after the system maintenance,\n");
+	printf("  if these jobs can not be run before the maintenance.\n\n"); 	
 	}
 }
+
+
+
+
+string Slurm_Showq::GetStdoutFromCommand(string cmd) 
+{
+  string data;
+  FILE * stream;
+  const int max_buffer = 256;
+  char buffer[max_buffer];
+  cmd.append(" 2>&1");
+
+  stream = popen(cmd.c_str(), "r");
+  if (stream) 
+    {
+    while (!feof(stream))
+      if  (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+        pclose(stream);
+    }
+  return data;
+}
+
