@@ -136,6 +136,7 @@ void Slurm_Showq::query_running_jobs()
       
       for(int i=0; i<job_ptr->record_count;i++)
 	{
+
 	  job_info_t * job;
 	  job = &job_ptr->job_array[i];
 
@@ -143,9 +144,9 @@ void Slurm_Showq::query_running_jobs()
 
 	  userString = uid_to_string(job->user_id);
 
-	  // DEBUGGING missing jobs
-          // if (job->job_id == 6284384)
-	  // printf("\nI catch you!!! reason=%d \n", job->state_reason);
+	// debugging missing jobs
+        //  if (job->job_id == 6284384)
+	//	printf("\nI catch you!!! reason=%d \n", job->state_reason);
  
 	  // keep track of pending jobs...
 
@@ -174,6 +175,7 @@ void Slurm_Showq::query_running_jobs()
 	      completing_jobs.push_back(i);
 
 	      // allow 5 minute grace window
+
 	      if(remain_time < 300) 
 		continue;
 
@@ -221,9 +223,9 @@ void Slurm_Showq::query_running_jobs()
 	  printf("%-8s","Running");
 	  
 	  if(long_listing)
-	     {
-               printf("%-6i ",job->num_cpus);;
-	     }
+		{
+		printf("%-6i ",job->num_cpus);;
+		}
 
           //print node number
           printf("%-5i",job->num_nodes);
@@ -284,6 +286,7 @@ void Slurm_Showq::query_running_jobs()
 	      printf(": %4i of %4i hosts (%6.2f %%)\n",rnodes,total_avail_nodes,(float)100.*rnodes/total_avail_nodes);
 	    else
 	      printf("\n");
+
 	  }
 
     }
@@ -309,6 +312,7 @@ void Slurm_Showq::query_running_jobs()
 
       for(int i=0; i<pending_jobs.size();i++)
 	{
+
 	  job_info_t * job;
 	  job = &job_ptr->job_array[pending_jobs[i]];
 
@@ -322,13 +326,11 @@ void Slurm_Showq::query_running_jobs()
 // Si Liu in Dec 2015:
 // Update the new SLURM PENDING_REASONS since SLURM 15:
 
+// For the following reasons, the job will not automatically run (This includes both blocked jobs and errored jobs!)
+
 // Si Liu in July 2019
 // Update the new SLURM QOS Qaiting REASONS for SLURM 19
 
-          //DEBUGGING
-          //printf("job id=%d reason= %d\n", job->job_id, job->state_reason);
-
-          // For the following reasons, the job will not automatically run (This includes both blocked jobs and errored jobs!)
 	  if(
 	     job->state_reason == WAIT_DEPENDENCY      ||  /* 2, dependent job has not completed */
 	     job->state_reason == WAIT_PART_NODE_LIMIT ||  /* 4  request exceeds partition node limit */
@@ -341,37 +343,33 @@ void Slurm_Showq::query_running_jobs()
 	     job->state_reason == FAIL_DOWN_PARTITION  ||  /* 18, partition for job is DOWN */
 	     job->state_reason == FAIL_DOWN_NODE       ||  /* 19, some node in the allocation failed */
 	     job->state_reason == FAIL_BAD_CONSTRAINTS ||  /* 20, constraints can not be satisfied */
-             job->state_reason == WAIT_DEP_INVALID     ||  /* 38, Dependency condition invalid or never*/
-    	     (job->state_reason >= WAIT_QOS_MAX_CPU_PER_JOB && job->state_reason <= WAIT_QOS_MIN_CPU) //QOS WAIT47-55
-            )
-	    {
-	    // printf("DEBUGGING: job id=%d reason= %d\n added to block", job->job_id, job->state_reason);
-            // printf("\n\nI am still blocked!\n\n");
+             job->state_reason == WAIT_DEP_INVALID	   /* 38, Dependency condition invalid or never*/
+    	     )
+	{
+        //      if (job->job_id == 6284384)
+	//	printf("\n\nI am still alive!\n\n");
 	      blocked_jobs++;
 	      continue;
 	    }
 
-          // Si Liu in Dec 2015:
-          // For the following reasons, the job will finally run without extra manipulation (Jobs are reported as Waiting!)
-  	  if(
-             job->state_reason == WAIT_NO_REASON       ||  /* 0,  not set or job not pending */
-	     job->state_reason == WAIT_PRIORITY        ||  /* 1,  higher priority jobs exist */	
-	     job->state_reason == WAIT_RESOURCES       ||  /* 3,  required resources not available */
-	     job->state_reason == WAIT_PART_DOWN       ||  /* 6,  requested partition is down */
-             job->state_reason == WAIT_PART_INACTIVE       /* 7,  requested partition is inactive */
+// Si Liu in Dec 2015:
+// For the following reasons, the job will finally run without extra manipulation (Jobs are reported as Waiting!)
+	  if(
+             job->state_reason != WAIT_NO_REASON       &&  /* 0,  not set or job not pending */
+	     job->state_reason != WAIT_PRIORITY        &&  /* 1,  higher priority jobs exist */	
+	     job->state_reason != WAIT_RESOURCES       &&  /* 3,  required resources not available */
+	     job->state_reason != WAIT_PART_DOWN       &&  /* 6,  requested partition is down */
+             job->state_reason != WAIT_PART_INACTIVE   &&    /* 7,  requested partition is inactive */
+	     job->state_reason < WAIT_QOS_MAX_CPU_PER_JOB && //QOS wait 47-55
+             job->state_reason > WAIT_QOS_MIN_CPU
             )
 	    {
-	       idle_jobs++;
-            }
-	  else
-            {
 	      printf("[Warn]: unknown job state - pending job reason = %i\n",job->state_reason);
 	      continue;
 	    }
 
-          //DEBUGGING
-          //printf("IDLE jobs: job id=%d reason= %d\n", job->job_id, job->state_reason);
-  
+	  idle_jobs++;
+
 	  // Display job info
 
 	  printf("%-10i", job->job_id);
@@ -387,9 +385,9 @@ void Slurm_Showq::query_running_jobs()
 	  printf("%-8s","Waiting");
 
           if(long_listing)
-            {
-	      printf("%-5i ",job->num_cpus);
-	    }	  
+		{
+		printf("%-5i ",job->num_cpus);
+		}	  
 	  printf("%-5i",job->num_nodes);
 
 	  if(long_listing)
@@ -447,11 +445,12 @@ void Slurm_Showq::query_running_jobs()
 
       for(int i=0; i<pending_jobs.size();i++)
 	{
+
 	  job_info_t * job;
 	  job = &job_ptr->job_array[pending_jobs[i]];
 
 	  if(job->job_state != JOB_PENDING)
-	    continue;
+	  	    continue;
 
 //	if (job->job_id == 6284384)
 //              printf("\n\nI am still alive!\n\n");
@@ -459,40 +458,25 @@ void Slurm_Showq::query_running_jobs()
 	  if ((local_user_jobs_only) &&
               (strcmp(current_user,uid_to_string(job->user_id).c_str()) != 0) )
             continue;
-
-        
-// DEBUGGING info
-// printf("job id=%d reason= %d\n", job->job_id, job->state_reason);
-       	
+	
 //Si Liu in Dec 2015: 
 //We updated this in version 15 or later:
 //The list of known errored jobs:  
-          if(
+         if(
 	    job->state_reason == WAIT_PART_NODE_LIMIT ||  /* 4  request exceeds partition node limit */
             job->state_reason == WAIT_PART_TIME_LIMIT ||  /* 5  request exceeds partition time limit */
             job->state_reason == FAIL_BAD_CONSTRAINTS ||  /* 20, constraints can not be satisfied */
 	    job->state_reason == WAIT_DEP_INVALID         /* 38, Dependency condition invalid or never*/
             )
-	  {
-	  // DEBUGGING info
-          // printf("\n\nI am still alive!\n\n"); 
+	{
+//	    if (job->job_id == 6284384)
+//                printf("\n\nI am still alive!\n\n"); 
 	    errored_jobs.push_back(pending_jobs[i]);
-          // DEBUGGING printf("\n\ncurrent error job size %d new job id %d \n\n",errored_jobs.size(),job->job_id);
+//	    printf("\n\ncurrent error job size %d new job id %d \n\n",errored_jobs.size(),job->job_id);
             continue;
 	}
 
-//Si Liu in Mar 2020:
-//Waiting Priority jobs -> alaready displayed in WAITING
-          if(
-            job->state_reason == WAIT_NO_REASON       ||  /* 0,  not set or job not pending */
-            job->state_reason == WAIT_PRIORITY        ||  /* 1,  higher priority jobs exist */
-            job->state_reason == WAIT_RESOURCES       ||  /* 3,  required resources not available */
-            job->state_reason == WAIT_PART_DOWN       ||  /* 6,  requested partition is down */
-            job->state_reason == WAIT_PART_INACTIVE       /* 7,  requested partition is inactive */
-            )
-	  continue;
-
- 	  if(
+	if(
              job->state_reason != WAIT_DEPENDENCY &&     /* 2 dependent job has not completed */
 	     job->state_reason != WAIT_HELD &&           /* 8 job is held by administrator */
 	     job->state_reason != WAIT_TIME &&           /* 9 job waiting for specific begin time */
@@ -558,9 +542,9 @@ void Slurm_Showq::query_running_jobs()
 	  }
 	 
           if(long_listing)
-	    {
-	      printf("%-6i ",job->num_cpus);
-	    }
+		{
+		printf("%-6i ",job->num_cpus);
+		}
           
           printf("%-5i",job->num_nodes);
 

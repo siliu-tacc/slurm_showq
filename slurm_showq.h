@@ -64,7 +64,7 @@ private:
   void print_usage();
   void print_version();
   char *getusername();	       
-  void read_runtime_config(std::string file);	
+  void read_runtime_config(std::string config_file, bool conf_sm);
   string GetStdoutFromCommand(string cmd);
   
   // Command line controls
