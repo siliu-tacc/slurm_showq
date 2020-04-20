@@ -6,6 +6,13 @@ Texas Advanced Computing Center
 Originally: November 2012
 karl@tacc.utexas.edu
 
+Modified: April, 2020 Include    cache_etcpwd_unames=1
+          in showq.conf file to use /etc/passwd username caching.
+          @TACC this reduced 9s execution time down to 0.2s.
+          milfeld@tacc.utexas.edu (Kent Milfeld in the wild:)
+
+TODO: More documentation is needed for showq.conf file. Kent
+
 -------------------
 Build Instructions:
 -------------------

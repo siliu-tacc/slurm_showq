@@ -900,22 +900,66 @@ char *Slurm_Showq::getusername()
   return user;
 }
 
-std::string Slurm_Showq::uid_to_string(uid_t id)
+string Slurm_Showq::uid_to_string (uid_t id)
 {
-  std::string username="nobody";
+  string username="nobody";
   struct passwd *pwd;
 
-  if( (pwd = getpwuid(id)) == NULL)
-    printf("Error: unable to ascertain user for uid = %u\n",id);
-  else
-    {
+//if( (named_user_jobs_only == true || user_jobs_only == true) || cache_etcpwd_unames == false)
+  if( cache_etcpwd_unames == false )
+  {
+    if( (pwd = getpwuid(id)) == NULL)
+      printf("Error: unable to ascertain user for uid = %u\n",id);
+    else
       username = pwd->pw_name;
+  }
+  else
+  {
+    username=uid_uname[(int)id];
+
+    if(username.empty())
+    {
+      username="nobody";
+      printf("Error: unable to ascertain user for uid = %u\n",id);
     }
+  }
 
   return(username);
-      
 }
 
+void Slurm_Showq::get_etcpwd_unames()
+{
+  string uname,x;
+  int    uid;
+
+  
+//if( named_user_jobs_only == false && user_jobs_only == false && cache_etcpwd_unames == true)
+  if( cache_etcpwd_unames == true )
+  {
+    const char *fileName="/etc/passwd";
+    ifstream pwdFile;
+    pwdFile.open(fileName);
+
+    string line;
+    while(getline(pwdFile,line)){
+                 //std::replace(line.begin(), line.end(), ':', ' ');  //might be faster
+      line.replace(line.find(":"), 1, " ");
+      line.replace(line.find(":"), 1, " ");
+      line.replace(line.find(":"), 1, " ");
+      istringstream ss(line);
+
+      ss >> uname >> x >> uid;
+
+      uid_uname[uid] = uname;
+
+    }
+    pwdFile.close();
+    //for(const auto& p :uid_uname){ cout << p.first << ' ' <<  p.second << endl;}
+
+  }
+
+  return;
+}
 //-------------------------------------------------------------
 // parse_supported_options: Parse/Define command line arguments
 //-------------------------------------------------------------
@@ -1021,6 +1065,7 @@ void Slurm_Showq::read_runtime_config(std::string config_file, bool conf_sm)
     ifile=config_file; 
   }  
 
+
   //cout<<"SLURM CONFIG FILE: "<<config_file<<endl<<endl;
   fp=fopen(config_file.c_str(),"r");
 
@@ -1032,7 +1077,7 @@ void Slurm_Showq::read_runtime_config(std::string config_file, bool conf_sm)
     }
   else
       {
-	GetPot parse(ifile.c_str(),"#","\n");
+        GetPot parse(ifile.c_str(),"#","\n");
 	//parse.print();
 
 	if(parse.size() <= 1)   // empty config file
@@ -1048,6 +1093,8 @@ void Slurm_Showq::read_runtime_config(std::string config_file, bool conf_sm)
 	    total_avail_nodes = num_hosts;
 	    show_utilization = true;
 	  }
+
+        cache_etcpwd_unames = parse("cache_etcpwd_unames",false);
       }
 
   return;
@@ -1074,6 +1121,8 @@ Slurm_Showq::Slurm_Showq()
   show_all_reserv  = false;
   show_utilization = false;
 
+  cache_etcpwd_unames = false;
+
 
   RES_LEAD_WINDOW = 24*7*3600;  // 7-day lead time
 
@@ -1085,12 +1134,12 @@ Slurm_Showq::Slurm_Showq()
 
   if(showq_conf)
         {
-        printf("The following showq configuration file is used:\n%s\n",showq_conf);
+     // printf("The following showq configuration file is used:\n%s\n",showq_conf);
         read_runtime_config(showq_conf, false);  //use TACC customized showq_conf
         }
   else
         {
-        printf("No additional configuration file is found.\nThe system default one is used.\n");
+     // printf("No additional configuration file is found.\nThe system default one is used.\n");
         read_runtime_config("/usr/local/bin/showq.conf", false); //use the system showq_conf 
         }
 

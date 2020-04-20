@@ -33,6 +33,9 @@ int main(int argc, char **argv)
   Slurm_Showq sq;
 
   sq.parse_supported_options(argc,argv);
+
+  sq.get_etcpwd_unames();  // uses cache if cache_etcpwd_unames flag is true
+
   sq.query_running_jobs();
 
   sq.check_maintenance();
