@@ -21,11 +21,24 @@ in showq.conf file to use /etc/passwd username caching.
 @TACC this reduced 9s execution time down to 0.2s.
 milfeld@tacc.utexas.edu (Kent Milfeld in the wild:)
 
-TODO: More documentation is needed for showq.conf file. Kent
 
--------------------
+
+----------------------------------
+showq.conf
+----------------------------------
+
+showq reads the "showq.conf" for any extra preset configuration values.
+The "TACC_SHOWQ_CONF" is used to specify the cusmotized configuration file as:
+
+export TACC_SHOWQ_CONF=my_showq_conf_file
+
+Adding "cache_etcpwd_unames=1" in the showq.conf will enable the user infomration caching feature for best performance.
+
+
+
+----------------------------------
 Build Instructions:
--------------------
+----------------------------------
 
 The build system uses standard auto-tools and should, in theory, work
 with:
