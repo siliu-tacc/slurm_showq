@@ -46,6 +46,9 @@ using namespace std;
 #include <cstdlib>
 #include <vector>
 
+#include <map>
+#include <sstream>
+
 #define VERSION 1.0
 
 class Slurm_Showq {
@@ -55,6 +58,10 @@ class Slurm_Showq {
   void query_running_jobs();
   void parse_supported_options(int argc, char *argv[]);
   void check_maintenance();
+
+  void get_etcpwd_unames ();
+
+  bool  cache_etcpwd_unames;
 
 private:
 
@@ -76,6 +83,9 @@ private:
   bool  show_all_reserv;
   bool  show_utilization;
   float RES_LEAD_WINDOW;
+
+//bool  cache_etcpwd_unames;
+  map   <int,string> uid_uname;
 
   std::string progname;		 // binary name for stdout
   int total_avail_nodes;	 // max # of nodes (for utilization calculations)
