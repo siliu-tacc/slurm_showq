@@ -1,15 +1,25 @@
-
 A "showq" style job summary utility for SLURM. Useful for generating a
 summary of all running, pending, and blocked jobs.
 
 Texas Advanced Computing Center
+
 Originally: November 2012
 karl@tacc.utexas.edu
 
-Modified: April, 2020 Include    cache_etcpwd_unames=1
-          in showq.conf file to use /etc/passwd username caching.
-          @TACC this reduced 9s execution time down to 0.2s.
-          milfeld@tacc.utexas.edu (Kent Milfeld in the wild:)
+Last update:
+April 21, 2020 
+Si Liu
+siliu@tacc.utexas.edu
+
+Modified:
+April 21, 2020 
+Merge all recent changes and clean up the repo
+
+Modified: 
+April 20, 2020 Include    cache_etcpwd_unames=1
+in showq.conf file to use /etc/passwd username caching.
+@TACC this reduced 9s execution time down to 0.2s.
+milfeld@tacc.utexas.edu (Kent Milfeld in the wild:)
 
 TODO: More documentation is needed for showq.conf file. Kent
 

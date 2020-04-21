@@ -1134,12 +1134,12 @@ Slurm_Showq::Slurm_Showq()
 
   if(showq_conf)
         {
-     // printf("The following showq configuration file is used:\n%s\n",showq_conf);
+        printf("Using customized configuration file: %s \n",showq_conf);
         read_runtime_config(showq_conf, false);  //use TACC customized showq_conf
         }
   else
         {
-     // printf("No additional configuration file is found.\nThe system default one is used.\n");
+        printf("Using system default configuration file \n");
         read_runtime_config("/usr/local/bin/showq.conf", false); //use the system showq_conf 
         }
 

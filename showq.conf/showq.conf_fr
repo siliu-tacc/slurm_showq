@@ -1,0 +1,5 @@
+hosts_available=8008
+slots_per_host_default=56
+cache_etcpwd_unames=1
+
+[queue]
